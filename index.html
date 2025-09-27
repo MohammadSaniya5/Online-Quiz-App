@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url(image.jpg);
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: yellow;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        h3 {
+            text-align: center;
+            color: yellow;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #quizNote {
+            background: rgba(37, 99, 235, 0.1);
+            color: black;
+            border: 1px solid #f4f5f7;
+            border-radius: 8px;
+            padding: 14px 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        #quizNote ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        #quizNote li {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 8px;
+            margin: 5px 0;
+            width: 96%;
+            border-radius: 5px;
+            border: 1px solid #19034b;
+        }
+
+        select,
+        button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #19034b;
+        }
+
+        button {
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .question {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            color: black;
+            background: #e2e8f0;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .options button:hover {
+            background: #cbd5e1;
+        }
+
+        .options button.correct {
+            background: #10b981;
+            color: black;
+        }
+
+        .options button.wrong {
+            background: #ef4444;
+            color: black;
+        }
+
+        .score,
+        .timer,
+        .streak {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        button#next,
+        button#hint {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button#back {
+            margin-top: 40px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button#next,
+        button#back {
+            background: #2563eb;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button#hint {
+            background: #f59e0b;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button#next:hover,
+        button#back:hover,
+        button#hint:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Online Quiz App</h2>
+
+
+    <div class="container" id="startScreen">
+        <h3>Welcome!</h3>
+        <input type="text" id="username" placeholder="Enter your name" required>
+        <select id="category">
+            <option value="General">General Knowledge</option>
+            <option value="Aptitude">Aptitude</option>
+            <option value="Reasoning">Logical / Reasoning</option>
+            <option value="Verbal">Verbal Ability / English</option>
+            <option value="Technical">Technical / Subject Knowledge</option>
+        </select>
+        <select id="level">
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+        </select>
+        <button id="startBtn">Start Quiz</button>
+    <div class="container" id="quizNote">
+        <h3>Quiz Instructions & Scoring</h3>
+        <ul>
+            <li>Total Questions: 10 per quiz</li>
+            <li>Time per Question: 15 seconds</li>
+            <li>Scoring: 10 points for correct answer + remaining seconds as bonus</li>
+            <li>Hint: Click "Show Hint" to get a hint (-1 point)</li>
+            <li>Wrong answer: 0 points, streak resets</li>
+            <li>Try to maintain a streak for extra motivation!</li>
+        </ul>
+    </div>
+    </div>
+    <div class="container" id="quizScreen" style="display:none;">
+        <div class="timer" id="timer">Time: 15</div>
+        <div class="streak" id="streak">Streak: 0</div>
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <button id="hint">Show Hint (-1 pt)</button>
+        <button id="next" style="display:none;">Next Question</button>
+        <div class="score" id="score"></div>
+        <button id="back" style="display:none;">Back to Start</button>
+    </div>
+
+    <script>
+        const allQuestions = [
+            { q: "Capital of France?", options: ["Paris", "London", "Berlin", "Rome"], answer: "Paris", hint: "City of Love", category: "General", level: "Easy" },
+            { q: "Which planet is known as the Red Planet?", options: ["Mars", "Venus", "Jupiter", "Saturn"], answer: "Mars", hint: "Fourth planet from Sun", category: "General", level: "Easy" },
+            { q: "Who invented the light bulb?", options: ["Thomas Edison", "Nikola Tesla", "Alexander Graham Bell", "Galileo"], answer: "Thomas Edison", hint: "Famous inventor", category: "General", level: "Easy" },
+            { q: "Largest ocean on Earth?", options: ["Pacific", "Atlantic", "Indian", "Arctic"], answer: "Pacific", hint: "Covers 1/3 of Earth", category: "General", level: "Easy" },
+            { q: "Which continent is Egypt in?", options: ["Africa", "Asia", "Europe", "Australia"], answer: "Africa", hint: "Northeast Africa", category: "General", level: "Easy" },
+            { q: "What is H2O?", options: ["Water", "Hydrogen Peroxide", "Oxygen", "Salt"], answer: "Water", hint: "Essential for life", category: "General", level: "Easy" },
+            { q: "Fastest land animal?", options: ["Cheetah", "Lion", "Tiger", "Leopard"], answer: "Cheetah", hint: "Can reach 120 km/h", category: "General", level: "Easy" },
+            { q: "Primary color?", options: ["Red", "Green", "Purple", "Orange"], answer: "Red", hint: "One of three basic colors", category: "General", level: "Easy" },
+            { q: "Which gas do humans breathe in?", options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], answer: "Oxygen", hint: "Essential for respiration", category: "General", level: "Easy" },
+            { q: "Biggest planet in the solar system?", options: ["Jupiter", "Mars", "Earth", "Saturn"], answer: "Jupiter", hint: "Gas giant", category: "General", level: "Easy" },
+
+
+            { q: "Who wrote '1984'?", options: ["George Orwell", "Aldous Huxley", "Mark Twain", "J.K. Rowling"], answer: "George Orwell", hint: "Dystopian novel", category: "General", level: "Medium" },
+            { q: "Which organ purifies blood?", options: ["Kidney", "Liver", "Heart", "Lungs"], answer: "Kidney", hint: "Filters waste", category: "General", level: "Medium" },
+            { q: "What is the chemical symbol for gold?", options: ["Au", "Ag", "Gd", "Go"], answer: "Au", hint: "From Latin 'Aurum'", category: "General", level: "Medium" },
+            { q: "Fastest bird in the world?", options: ["Peregrine Falcon", "Eagle", "Sparrow", "Ostrich"], answer: "Peregrine Falcon", hint: "Dives at high speed", category: "General", level: "Medium" },
+            { q: "Largest desert in the world?", options: ["Sahara", "Gobi", "Kalahari", "Arctic"], answer: "Sahara", hint: "Northern Africa", category: "General", level: "Medium" },
+            { q: "Who proposed the theory of relativity?", options: ["Albert Einstein", "Isaac Newton", "Galileo", "Nikola Tesla"], answer: "Albert Einstein", hint: "E = mc^2", category: "General", level: "Medium" },
+            { q: "What is the boiling point of water in Celsius?", options: ["100°C", "90°C", "80°C", "120°C"], answer: "100°C", hint: "At standard pressure", category: "General", level: "Medium" },
+            { q: "Which country has the Great Barrier Reef?", options: ["Australia", "USA", "Brazil", "South Africa"], answer: "Australia", hint: "Famous coral reef", category: "General", level: "Medium" },
+            { q: "Who painted the Mona Lisa?", options: ["Leonardo da Vinci", "Michelangelo", "Raphael", "Van Gogh"], answer: "Leonardo da Vinci", hint: "Famous Renaissance artist", category: "General", level: "Medium" },
+            { q: "Smallest prime number?", options: ["2", "1", "3", "0"], answer: "2", hint: "Only even prime", category: "General", level: "Medium" },
+
+            { q: "Which year did World War II end?", options: ["1945", "1939", "1942", "1944"], answer: "1945", hint: "Mid 40s", category: "General", level: "Hard" },
+            { q: "The theory of evolution was proposed by?", options: ["Charles Darwin", "Isaac Newton", "Albert Einstein", "Gregor Mendel"], answer: "Charles Darwin", hint: "On the Origin of Species", category: "General", level: "Hard" },
+            { q: "Which is the largest internal organ in human body?", options: ["Liver", "Heart", "Lung", "Kidney"], answer: "Liver", hint: "Helps in detoxification", category: "General", level: "Hard" },
+            { q: "What is the square root of 256?", options: ["16", "14", "18", "12"], answer: "16", hint: "Perfect square", category: "General", level: "Hard" },
+            { q: "Which gas is most abundant in Earth's atmosphere?", options: ["Nitrogen", "Oxygen", "Carbon Dioxide", "Hydrogen"], answer: "Nitrogen", hint: "About 78%", category: "General", level: "Hard" },
+            { q: "Mount Everest is located in which country?", options: ["Nepal", "India", "China", "Bhutan"], answer: "Nepal", hint: "Himalayas", category: "General", level: "Hard" },
+            { q: "Which is the smallest continent by area?", options: ["Australia", "Europe", "Antarctica", "South America"], answer: "Australia", hint: "Oceania", category: "General", level: "Hard" },
+            { q: "Who discovered penicillin?", options: ["Alexander Fleming", "Louis Pasteur", "Marie Curie", "Robert Koch"], answer: "Alexander Fleming", hint: "Mold experiment", category: "General", level: "Hard" },
+            { q: "Speed of light in vacuum?", options: ["3x10^8 m/s", "3x10^6 m/s", "3x10^5 m/s", "3x10^7 m/s"], answer: "3x10^8 m/s", hint: "Approx. 300,000 km/s", category: "General", level: "Hard" },
+            { q: "Who is known as the Father of Computers?", options: ["Charles Babbage", "Alan Turing", "John von Neumann", "Steve Jobs"], answer: "Charles Babbage", hint: "Analytical Engine", category: "General", level: "Hard" },
+            { q: "Which element has the atomic number 1?", options: ["Hydrogen", "Helium", "Oxygen", "Carbon"], answer: "Hydrogen", hint: "Lightest element", category: "General", level: "Hard" },
+            { q: "What is the hardest natural substance?", options: ["Diamond", "Gold", "Iron", "Platinum"], answer: "Diamond", hint: "Used in cutting tools", category: "General", level: "Hard" },
+            { q: "The longest river in the world?", options: ["Nile", "Amazon", "Yangtze", "Mississippi"], answer: "Nile", hint: "Africa", category: "General", level: "Hard" },
+            { q: "Which planet has the most moons?", options: ["Saturn", "Jupiter", "Earth", "Mars"], answer: "Saturn", hint: "Ringed planet", category: "General", level: "Hard" },
+            { q: "Who invented the telephone?", options: ["Alexander Graham Bell", "Thomas Edison", "Nikola Tesla", "Guglielmo Marconi"], answer: "Alexander Graham Bell", hint: "Voice transmission", category: "General", level: "Hard" },
+            { q: "Smallest bone in human body?", options: ["Stapes", "Femur", "Tibia", "Humerus"], answer: "Stapes", hint: "Ear bone", category: "General", level: "Hard" },
+            { q: "Which country gifted the Statue of Liberty?", options: ["France", "UK", "USA", "Germany"], answer: "France", hint: "1886", category: "General", level: "Hard" },
+            { q: "Which is the largest desert on Earth?", options: ["Antarctic Desert", "Sahara", "Gobi", "Kalahari"], answer: "Antarctic Desert", hint: "Cold desert", category: "General", level: "Hard" },
+            { q: "Which vitamin is produced when sunlight hits skin?", options: ["Vitamin D", "Vitamin C", "Vitamin A", "Vitamin B12"], answer: "Vitamin D", hint: "Sunlight helps", category: "General", level: "Hard" },
+            { q: "Which scientist proposed the three laws of motion?", options: ["Isaac Newton", "Galileo", "Einstein", "Kepler"], answer: "Isaac Newton", hint: "Classical mechanics", category: "General", level: "Hard" },
+
+            { q: "5 + 7 = ?", options: ["10", "12", "11", "13"], answer: "12", hint: "Double of 6", category: "Aptitude", level: "Easy" },
+            { q: "10 × 6 = ?", options: ["60", "56", "66", "50"], answer: "60", hint: "10 times 6", category: "Aptitude", level: "Easy" },
+            { q: "45 ÷ 5 = ?", options: ["9", "8", "7", "10"], answer: "9", hint: "45 divided by 5", category: "Aptitude", level: "Easy" },
+            { q: "20% of 150 = ?", options: ["30", "20", "25", "35"], answer: "30", hint: "20 percent means 20/100", category: "Aptitude", level: "Easy" },
+            { q: "15 + 25 = ?", options: ["35", "40", "30", "45"], answer: "40", hint: "Sum them up", category: "Aptitude", level: "Easy" },
+            { q: "12 × 12 = ?", options: ["144", "124", "154", "134"], answer: "144", hint: "Square of 12", category: "Aptitude", level: "Easy" },
+            { q: "50 – 25 = ?", options: ["20", "25", "30", "15"], answer: "25", hint: "Subtract", category: "Aptitude", level: "Easy" },
+            { q: "30 ÷ 6 = ?", options: ["5", "6", "4", "7"], answer: "5", hint: "Divide", category: "Aptitude", level: "Easy" },
+            { q: "10% of 200 = ?", options: ["20", "25", "30", "15"], answer: "20", hint: "10 percent", category: "Aptitude", level: "Easy" },
+            { q: "7 + 8 = ?", options: ["14", "15", "16", "13"], answer: "15", hint: "Simple addition", category: "Aptitude", level: "Easy" },
+
+
+            { q: "A train travels 60 km in 1 hr. How long for 180 km?", options: ["2 hr", "3 hr", "4 hr", "5 hr"], answer: "3 hr", hint: "Time = Distance / Speed", category: "Aptitude", level: "Medium" },
+            { q: "Find the missing number: 2, 4, 8, 16, ?", options: ["18", "24", "32", "20"], answer: "32", hint: "Each number doubles", category: "Aptitude", level: "Medium" },
+            { q: "Profit if cost=200, selling=250?", options: ["50", "40", "60", "45"], answer: "50", hint: "Profit = Selling – Cost", category: "Aptitude", level: "Medium" },
+            { q: "Average of 10, 20, 30 = ?", options: ["15", "20", "25", "30"], answer: "20", hint: "Sum ÷ Number of items", category: "Aptitude", level: "Medium" },
+            { q: "Simple Interest: P=1000, R=5%, T=2yr?", options: ["100", "50", "200", "150"], answer: "100", hint: "SI = P*R*T/100", category: "Aptitude", level: "Medium" },
+            { q: "Ratio of 10:20 = ?", options: ["1:2", "2:1", "2:3", "3:2"], answer: "1:2", hint: "Simplify the fraction", category: "Aptitude", level: "Medium" },
+            { q: "25% of 400 = ?", options: ["100", "120", "90", "80"], answer: "100", hint: "25 percent", category: "Aptitude", level: "Medium" },
+            { q: "15 × 12 = ?", options: ["180", "170", "190", "160"], answer: "180", hint: "Multiply", category: "Aptitude", level: "Medium" },
+            { q: "Time & Work: 5 people do a task in 10 days. How many days for 10 people?", options: ["5", "8", "10", "12"], answer: "5", hint: "More people = less time", category: "Aptitude", level: "Medium" },
+            { q: "3² + 4² = ?", options: ["25", "24", "26", "20"], answer: "25", hint: "Pythagoras", category: "Aptitude", level: "Medium" },
+
+            { q: "Solve: x² – 5x + 6 = 0", options: ["2 & 3", "1 & 6", "3 & 4", "2 & 4"], answer: "2 & 3", hint: "Factorize", category: "Aptitude", level: "Hard" },
+            { q: "Compound Interest P=1000, R=10%, T=2yr", options: ["210", "200", "220", "100"], answer: "210", hint: "CI = P*((1+R/100)^T –1)", category: "Aptitude", level: "Hard" },
+            { q: "Number series: 2, 6, 12, 20, ?", options: ["28", "30", "26", "24"], answer: "30", hint: "Pattern: add 4,6,8...", category: "Aptitude", level: "Hard" },
+            { q: "7/8 + 5/12 = ?", options: ["29/24", "31/24", "23/24", "19/24"], answer: "29/24", hint: "LCM of denominators", category: "Aptitude", level: "Hard" },
+            { q: "2x + 3y = 12; x=2 → y=?", options: ["2", "3", "4", "6"], answer: "2", hint: "Plug x=2", category: "Aptitude", level: "Hard" },
+            { q: "Permutation: 5! = ?", options: ["120", "100", "150", "60"], answer: "120", hint: "Factorial", category: "Aptitude", level: "Hard" },
+            { q: "Probability of rolling 1 on die?", options: ["1/6", "1/5", "1/4", "1/3"], answer: "1/6", hint: "One favorable outcome", category: "Aptitude", level: "Hard" },
+            { q: "Average speed = 60 km/h; distance = 180 km → time?", options: ["3 hr", "2 hr", "4 hr", "5 hr"], answer: "3 hr", hint: "Time = Distance/Speed", category: "Aptitude", level: "Hard" },
+            { q: "Ratio problem: 3:5, total=40 → first part?", options: ["15", "25", "10", "20"], answer: "15", hint: "Split in ratio", category: "Aptitude", level: "Hard" },
+            { q: "9² – 6² = ?", options: ["45", "63", "54", "36"], answer: "45", hint: "Difference of squares", category: "Aptitude", level: "Hard" },
+
+
+            { q: "Find the odd one out: 2, 4, 6, 9", options: ["2", "4", "6", "9"], answer: "9", hint: "All others even", category: "Reasoning", level: "Easy" },
+            { q: "Next in series: 1, 2, 3, 4, ?", options: ["5", "6", "7", "8"], answer: "5", hint: "Simple counting", category: "Reasoning", level: "Easy" },
+            { q: "If A>B and B>C, then A>C? (True/False)", options: ["True", "False"], answer: "True", hint: "Transitive property", category: "Reasoning", level: "Easy" },
+            { q: "Complete: 5,10,15,?", options: ["20", "25", "30", "18"], answer: "20", hint: "Add 5", category: "Reasoning", level: "Easy" },
+            { q: "Which is next: 2,4,8,16,?", options: ["20", "24", "32", "30"], answer: "32", hint: "Multiply by 2", category: "Reasoning", level: "Easy" },
+            { q: "Find missing letter: A, C, E, ?", options: ["G", "F", "H", "I"], answer: "G", hint: "Skip one letter", category: "Reasoning", level: "Easy" },
+            { q: "Complete: Monday, Wednesday, Friday, ?", options: ["Sunday", "Thursday", "Saturday", "Tuesday"], answer: "Sunday", hint: "Alternate days pattern", category: "Reasoning", level: "Easy" },
+            { q: "Which number doesn't belong: 3, 7, 9, 11", options: ["3", "7", "9", "11"], answer: "9", hint: "Others prime", category: "Reasoning", level: "Easy" },
+            { q: "2,4,8,16,?", options: ["20", "24", "32", "30"], answer: "32", hint: "Multiply by 2", category: "Reasoning", level: "Easy" },
+            { q: "Odd one: Cat, Dog, Car, Mouse", options: ["Cat", "Dog", "Car", "Mouse"], answer: "Car", hint: "Others animals", category: "Reasoning", level: "Easy" },
+
+            { q: "If all cats are animals and some animals are dogs, are all cats dogs?", options: ["Yes", "No"], answer: "No", hint: "Logical reasoning", category: "Reasoning", level: "Medium" },
+            { q: "Next series: 3, 6, 9, 12, ?", options: ["15", "18", "16", "20"], answer: "15", hint: "Add 3", category: "Reasoning", level: "Medium" },
+            { q: "Find missing: 2, 5, 10, 17, ?", options: ["26", "24", "25", "27"], answer: "26", hint: "Add consecutive odd numbers", category: "Reasoning", level: "Medium" },
+            { q: "Seating arrangement puzzle", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option2", hint: "Check adjacency", category: "Reasoning", level: "Medium" },
+            { q: "If A → B, B → C, then A → C?", options: ["Yes", "No"], answer: "Yes", hint: "Transitive", category: "Reasoning", level: "Medium" },
+            { q: "Code: If A=1,B=2,AB=?", "options": ["3", "12", "21", "4"], answer: "3", hint: "Add values", category: "Reasoning", level: "Medium" },
+            { q: "Logical puzzle: 5 people sit in a row, X next to Y?", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option1", hint: "Check positions", category: "Reasoning", level: "Medium" },
+            { q: "Blood relation: A is B’s father, C is A’s son, how is C related to B?", options: ["Son", "Grandson", "Brother", "Father"], answer: "Son", hint: "Use family tree", category: "Reasoning", level: "Medium" },
+            { q: "Find pattern: 2,4,8,14,?", options: ["20", "22", "18", "24"], answer: "20", hint: "Difference pattern", category: "Reasoning", level: "Medium" },
+            { q: "Which number is missing: 1,4,9,16,?", options: ["20", "25", "24", "30"], answer: "25", hint: "Square numbers", category: "Reasoning", level: "Medium" },
+
+            { q: "Puzzle: Five friends sit in different chairs, X left of Y, Z right of W, etc.", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option3", hint: "Logic diagram", category: "Reasoning", level: "Hard" },
+            { q: "Syllogism: All A are B, Some B are C, are all A C?", options: ["Yes", "No"], answer: "No", hint: "Use Venn diagram", category: "Reasoning", level: "Hard" },
+            { q: "Series: 2,6,12,20,30,?", options: ["42", "40", "44", "36"], answer: "42", hint: "Pattern n^2+n", category: "Reasoning", level: "Hard" },
+            { q: "Complex puzzle: If X+Y=Z, Y+Z=W, find X?", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option2", hint: "Equation solve", category: "Reasoning", level: "Hard" },
+            { q: "Analogy: Dog : Bark :: Cat : ?", options: ["Meow", "Mew", "Miaow", "Rawr"], answer: "Meow", hint: "Sound of cat", category: "Reasoning", level: "Hard" },
+            { q: "Blood relation: P is Q's brother, R is Q's mother, how is P related to R?", options: ["Son", "Father", "Uncle", "Nephew"], answer: "Son", hint: "Family tree", category: "Reasoning", level: "Hard" },
+            { q: "Logical reasoning: A is taller than B, C is shorter than A, who is tallest?", options: ["A", "B", "C", "Cannot say"], answer: "A", hint: "Compare heights", category: "Reasoning", level: "Hard" },
+            { q: "Pattern: 1,3,6,10,?", options: ["15", "14", "16", "13"], answer: "15", hint: "Triangular numbers", category: "Reasoning", level: "Hard" },
+            { q: "Puzzle: If Monday +1=Wednesday, Friday +1=?", options: ["Saturday", "Sunday", "Thursday", "Tuesday"], answer: "Sunday", hint: "Calendar trick", category: "Reasoning", level: "Hard" },
+            { q: "Series: 5,10,20,40,?", options: ["80", "85", "90", "75"], answer: "80", hint: "Double each time", category: "Reasoning", level: "Hard" },
+
+
+            { q: "Synonym of 'Happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], answer: "Joyful", hint: "Positive emotion", category: "Verbal", level: "Easy" },
+            { q: "Antonym of 'Hot'?", options: ["Cold", "Warm", "Boiling", "Heat"], answer: "Cold", hint: "Opposite of hot", category: "Verbal", level: "Easy" },
+            { q: "Fill in blank: I ___ a book.", options: ["reads", "read", "am read", "reading"], answer: "read", hint: "Past tense", category: "Verbal", level: "Easy" },
+            { q: "Plural of 'Child'?", options: ["Childs", "Children", "Childes", "Childer"], answer: "Children", hint: "Plural form", category: "Verbal", level: "Easy" },
+            { q: "Choose correct: He ___ happy.", options: ["is", "are", "am", "be"], answer: "is", hint: "Correct verb", category: "Verbal", level: "Easy" },
+            { q: "Synonym of 'Quick'?", options: ["Fast", "Slow", "Late", "Lazy"], answer: "Fast", hint: "Speed", category: "Verbal", level: "Easy" },
+            { q: "Antonym of 'Big'?", options: ["Small", "Huge", "Tall", "Large"], answer: "Small", hint: "Opposite", category: "Verbal", level: "Easy" },
+            { q: "Fill in blank: She ___ to school.", options: ["go", "goes", "went", "going"], answer: "goes", hint: "Third person singular", category: "Verbal", level: "Easy" },
+            { q: "Synonym of 'Smart'?", options: ["Clever", "Dumb", "Slow", "Lazy"], answer: "Clever", hint: "Intelligence", category: "Verbal", level: "Easy" },
+            { q: "Choose correct: They ___ playing.", options: ["is", "are", "am", "be"], answer: "are", hint: "Plural subject", category: "Verbal", level: "Easy" },
+
+
+            { q: "Correct sentence: She ___ done her homework.", options: ["has", "have", "had", "is"], answer: "has", hint: "Present perfect", category: "Verbal", level: "Medium" },
+            { q: "Synonym of 'Begin'?", options: ["Start", "End", "Finish", "Stop"], answer: "Start", hint: "Start meaning", category: "Verbal", level: "Medium" },
+            { q: "Antonym of 'Difficult'?", options: ["Easy", "Hard", "Tough", "Challenging"], answer: "Easy", hint: "Opposite", category: "Verbal", level: "Medium" },
+            { q: "Choose correct: He is taller ___ I am.", options: ["than", "then", "that", "when"], answer: "than", hint: "Comparison", category: "Verbal", level: "Medium" },
+            { q: "Fill blank: I will ___ him tomorrow.", options: ["see", "saw", "seen", "seeing"], answer: "see", hint: "Future tense", category: "Verbal", level: "Medium" },
+            { q: "Synonym of 'Angry'?", options: ["Mad", "Happy", "Sad", "Excited"], answer: "Mad", hint: "Emotion", category: "Verbal", level: "Medium" },
+            { q: "Antonym of 'Early'?", options: ["Late", "Soon", "Quick", "Fast"], answer: "Late", hint: "Opposite", category: "Verbal", level: "Medium" },
+            { q: "Correct sentence: They ___ been to Paris.", options: ["have", "has", "had", "is"], answer: "have", hint: "Present perfect plural", category: "Verbal", level: "Medium" },
+            { q: "Choose correct: I ___ my homework.", options: ["did", "do", "does", "doing"], answer: "did", hint: "Past tense", category: "Verbal", level: "Medium" },
+            { q: "Synonym of 'Beautiful'?", options: ["Pretty", "Ugly", "Bad", "Plain"], answer: "Pretty", hint: "Looks good", category: "Verbal", level: "Medium" },
+
+
+            { q: "Idiom: 'Break the ice' means?", options: ["Start conversation", "Shatter ice", "End relationship", "Begin fight"], answer: "Start conversation", hint: "Social context", category: "Verbal", level: "Hard" },
+            { q: "Antonym of 'Obscure'?", options: ["Clear", "Hidden", "Vague", "Dark"], answer: "Clear", hint: "Opposite", category: "Verbal", level: "Hard" },
+            { q: "Synonym of 'Eloquent'?", options: ["Fluent", "Mute", "Silent", "Unclear"], answer: "Fluent", hint: "Speaking skill", category: "Verbal", level: "Hard" },
+            { q: "Fill blank: Had I ___ you earlier, I would have helped.", options: ["known", "know", "knows", "knew"], answer: "known", hint: "Past perfect", category: "Verbal", level: "Hard" },
+            { q: "Choose correct: No sooner ___ he arrived than it started raining.", options: ["did", "do", "does", "done"], answer: "did", hint: "Inversion", category: "Verbal", level: "Hard" },
+            { q: "Antonym of 'Candid'?", options: ["Secretive", "Open", "Honest", "Frank"], answer: "Secretive", hint: "Opposite meaning", category: "Verbal", level: "Hard" },
+            { q: "Synonym of 'Innovative'?", options: ["Creative", "Boring", "Old", "Dull"], answer: "Creative", hint: "Idea skill", category: "Verbal", level: "Hard" },
+            { q: "Correct: Neither of the boys ___ done it.", options: ["has", "have", "had", "is"], answer: "has", hint: "Singular subject", category: "Verbal", level: "Hard" },
+            { q: "Idiom: 'Hit the sack' means?", options: ["Go to sleep", "Hit bag", "Fight", "Relax"], answer: "Go to sleep", hint: "Sleep meaning", category: "Verbal", level: "Hard" },
+            { q: "Fill: She behaves ___ she knows everything.", options: ["as if", "like", "as", "than"], answer: "as if", hint: "Expression", category: "Verbal", level: "Hard" },
+
+
+            { q: "HTML stands for?", options: ["Hyper Text Markup Language", "High Tool Markup", "Home Text Machine", "Hyperlink Text"], answer: "Hyper Text Markup Language", hint: "Webpage structure", category: "Technical", level: "Easy" },
+            { q: "CSS used for?", options: ["Styling", "Scripting", "Database", "Backend"], answer: "Styling", hint: "Style webpages", category: "Technical", level: "Easy" },
+            { q: "JS used for?", options: ["Styling", "Backend", "Web apps", "Database"], answer: "Web apps", hint: "Frontend scripting", category: "Technical", level: "Easy" },
+            { q: "Python is?", options: ["Programming Language", "OS", "Database", "Framework"], answer: "Programming Language", hint: "General purpose", category: "Technical", level: "Easy" },
+            { q: "C++ is?", options: ["Language", "OS", "App", "Software"], answer: "Language", hint: "Object-oriented", category: "Technical", level: "Easy" },
+            { q: "Git used for?", options: ["Version control", "Hosting", "Styling", "Database"], answer: "Version control", hint: "Track changes", category: "Technical", level: "Easy" },
+            { q: "SQL used for?", options: ["Database", "Styling", "Frontend", "Backend"], answer: "Database", hint: "Query data", category: "Technical", level: "Easy" },
+            { q: "Bootstrap is?", options: ["CSS framework", "Programming Language", "Database", "OS"], answer: "CSS framework", hint: "Frontend", category: "Technical", level: "Easy" },
+            { q: "Linux is?", options: ["OS", "Language", "Software", "Database"], answer: "OS", hint: "Operating System", category: "Technical", level: "Easy" },
+            { q: "HTTP stands for?", options: ["Hypertext Transfer Protocol", "Hypertext Text Protocol", "Home Transfer Protocol", "Hyper Tool Protocol"], answer: "Hypertext Transfer Protocol", hint: "Web protocol", category: "Technical", level: "Easy" },
+
+
+            { q: "JS function to convert string to int?", options: ["parseInt()", "int()", "Number()", "convertInt()"], answer: "parseInt()", hint: "JS built-in", category: "Technical", level: "Medium" },
+            { q: "SQL command to fetch all rows?", options: ["SELECT * FROM table", "GET * FROM table", "FETCH * FROM table", "SHOW ALL"], answer: "SELECT * FROM table", hint: "Standard query", category: "Technical", level: "Medium" },
+            { q: "CSS to center div?", options: ["margin:auto", "text-align:center", "padding:auto", "align:center"], answer: "margin:auto", hint: "Block element", category: "Technical", level: "Medium" },
+            { q: "Python list append method?", options: ["append()", "add()", "insert()", "extend()"], answer: "append()", hint: "Add item", category: "Technical", level: "Medium" },
+            { q: "C++ pointer symbol?", options: ["*", "&", "%", "#"], answer: "*", hint: "Pointer dereference", category: "Technical", level: "Medium" },
+            { q: "JS event for click?", options: ["onclick", "onhover", "onchange", "onload"], answer: "onclick", hint: "Button click", category: "Technical", level: "Medium" },
+            { q: "HTML tag for table row?", options: ["tr", "td", "th", "table"], answer: "tr", hint: "Table row", category: "Technical", level: "Medium" },
+            { q: "Python to check type?", options: ["type()", "typeof()", "isinstance()", "checktype()"], answer: "type()", hint: "Get variable type", category: "Technical", level: "Medium" },
+            { q: "SQL for unique values?", options: ["DISTINCT", "UNIQUE", "DIFFERENT", "ONLY"], answer: "DISTINCT", hint: "Remove duplicates", category: "Technical", level: "Medium" },
+            { q: "JS to convert JSON to object?", options: ["JSON.parse()", "JSON.stringify()", "JSON.convert()", "parseJSON()"], answer: "JSON.parse()", hint: "Parse JSON string", category: "Technical", level: "Medium" },
+
+
+            { q: "C++ OOP concept not supported?", options: ["Encapsulation", "Polymorphism", "Inheritance", "Compilation"], answer: "Compilation", hint: "Not OOP concept", category: "Technical", level: "Hard" },
+            { q: "Python generator keyword?", options: ["yield", "return", "generate", "yielded"], answer: "yield", hint: "Lazy evaluation", category: "Technical", level: "Hard" },
+            { q: "JS closure is?", options: ["Function + Lexical scope", "Object", "Variable", "Loop"], answer: "Function + Lexical scope", hint: "Inner function", category: "Technical", level: "Hard" },
+            { q: "SQL join types?", options: ["INNER, LEFT, RIGHT, FULL", "ADD, SUB, MUL", "CREATE, INSERT", "SELECT, DELETE"], answer: "INNER, LEFT, RIGHT, FULL", hint: "Combining tables", category: "Technical", level: "Hard" },
+            { q: "Python decorator syntax?", options: ["@decorator", "$decorator", "#decorator", "decorator()"], answer: "@decorator", hint: "Modify functions", category: "Technical", level: "Hard" },
+            { q: "JS prototype is?", options: ["Inheritance mechanism", "Variable", "Array", "Loop"], answer: "Inheritance mechanism", hint: "All objects inherit", category: "Technical", level: "Hard" },
+            { q: "Linux command to list files?", options: ["ls", "dir", "list", "show"], answer: "ls", hint: "Terminal command", category: "Technical", level: "Hard" },
+            { q: "HTTP status code 404 means?", options: ["Not Found", "OK", "Server Error", "Redirect"], answer: "Not Found", hint: "Client request", category: "Technical", level: "Hard" },
+            { q: "Python context manager keyword?", options: ["with", "for", "using", "context"], answer: "with", hint: "Resource management", category: "Technical", level: "Hard" },
+            { q: "C++ virtual function purpose?", options: ["Runtime polymorphism", "Compile-time binding", "Memory allocation", "Pointer"], answer: "Runtime polymorphism", hint: "OOP concept", category: "Technical", level: "Hard" },
+        ];
+
+        let username = "", category = "", level = "", questions = [], currentQ = 0, score = 0, streak = 0, timeLeft = 15, timerInterval;
+
+        const startScreen = document.getElementById('startScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const startBtn = document.getElementById('startBtn');
+        const backBtn = document.getElementById('back');
+        const hintBtn = document.getElementById('hint');
+
+        const usernameInput = document.getElementById('username');
+        const categorySelect = document.getElementById('category');
+        const levelSelect = document.getElementById('level');
+
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const scoreEl = document.getElementById('score');
+        const nextBtn = document.getElementById('next');
+        const timerEl = document.getElementById('timer');
+        const streakEl = document.getElementById('streak');
+
+        function startTimer() {
+            timeLeft = 15;
+            timerEl.textContent = `Time: ${timeLeft}`;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = `Time: ${timeLeft}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    disableOptions();
+                    nextBtn.style.display = 'block';
+                    streak = 0; updateStreak();
+                }
+            }, 1000);
+        }
+
+        function updateStreak() { streakEl.textContent = `Streak: ${streak}`; }
+
+        function loadQuestion() {
+            nextBtn.style.display = 'none';
+            hintBtn.style.display = 'inline';
+            startTimer();
+            const q = questions[currentQ];
+            questionEl.textContent = q.q;
+            optionsEl.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(btn, opt, q);
+                optionsEl.appendChild(btn);
+            });
+            scoreEl.textContent = `Score: ${score}`;
+        }
+
+        function checkAnswer(btn, opt, q) {
+            clearInterval(timerInterval);
+            if (opt === q.answer) {
+                btn.classList.add('correct');
+                score += 10 + timeLeft;
+                streak++;
+            } else {
+                btn.classList.add('wrong');
+                Array.from(optionsEl.children).forEach(b => { if (b.textContent === q.answer) b.classList.add('correct'); });
+                streak = 0;
+            }
+            disableOptions();
+            updateStreak();
+            nextBtn.style.display = 'block';
+            scoreEl.textContent = `Score: ${score}`;
+        }
+
+        function disableOptions() {
+            Array.from(optionsEl.children).forEach(b => b.disabled = true);
+        }
+
+        hintBtn.onclick = () => {
+            alert(`Hint: ${questions[currentQ].hint}`);
+            score = Math.max(score - 1, 0);
+            scoreEl.textContent = `Score: ${score}`;
+            hintBtn.style.display = 'none';
+        }
+
+        nextBtn.onclick = () => {
+            currentQ++;
+            if (currentQ < questions.length) loadQuestion();
+            else finishQuiz();
+        }
+
+        function finishQuiz() {
+            questionEl.textContent = `Quiz Completed!`;
+            optionsEl.innerHTML = '';
+            nextBtn.style.display = 'none';
+            hintBtn.style.display = 'none';
+            timerEl.style.display = 'none';
+            streakEl.style.display = 'none';
+            backBtn.style.display = 'block';
+            scoreEl.textContent = `Your Score: ${score}`;
+        }
+
+        startBtn.onclick = () => {
+            username = usernameInput.value.trim();
+            category = categorySelect.value;
+            level = levelSelect.value;
+            if (!username) { alert("Enter your name"); return; }
+            questions = allQuestions.filter(q => q.category === category && q.level === level);
+            if (questions.length === 0) questions = allQuestions.filter(q => q.category === category);
+            if (questions.length === 0) questions = [...allQuestions];
+            startScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            timerEl.style.display = 'block';
+            streakEl.style.display = 'block';
+            backBtn.style.display = 'none';
+            currentQ = 0;
+            score = 0;
+            streak = 0;
+            loadQuestion();
+        }
+
+        backBtn.onclick = () => {
+            startScreen.style.display = 'block';
+            quizScreen.style.display = 'none';
+            timerEl.style.display = 'block';
+            streakEl.style.display = 'block';
+            usernameInput.value = '';
+            scoreEl.textContent = '';
+        }
+    </script>
+
+</body>
+
+</html>
