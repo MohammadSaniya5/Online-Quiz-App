@@ -26,7 +26,7 @@ This project focuses on clean UI design, smooth navigation, and real-time quiz e
 
 ##  Project Structure
 
-Online-Quiz-App/
+Online-Quiz-App/ 
 │
 ├── index.html
 ├── quiz.html
