@@ -24,18 +24,6 @@ This project focuses on clean UI design, smooth navigation, and real-time quiz e
 
 ---
 
-##  Project Structure
-
-Online-Quiz-App/ 
-│
-├── index.html
-├── quiz.html
-├── style.css
-├── script.js
-└── assets/
-
----
-
 ##  Learning Outcomes
 
 - Implemented dynamic quiz logic using JavaScript  
