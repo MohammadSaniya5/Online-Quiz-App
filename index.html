@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,7 @@
 
         #quizNote {
             background: rgba(37, 99, 235, 0.1);
-            color: black;
+            color: white;
             border: 1px solid #f4f5f7;
             border-radius: 8px;
             padding: 14px 10px;
@@ -183,17 +184,17 @@
             <option value="Hard">Hard</option>
         </select>
         <button id="startBtn">Start Quiz</button>
-    <div class="container" id="quizNote">
-        <h3>Quiz Instructions & Scoring</h3>
-        <ul>
-            <li>Total Questions: 10 per quiz</li>
-            <li>Time per Question: 15 seconds</li>
-            <li>Scoring: 10 points for correct answer + remaining seconds as bonus</li>
-            <li>Hint: Click "Show Hint" to get a hint (-1 point)</li>
-            <li>Wrong answer: 0 points, streak resets</li>
-            <li>Try to maintain a streak for extra motivation!</li>
-        </ul>
-    </div>
+        <div class="container" id="quizNote">
+            <h3>Quiz Instructions & Scoring</h3>
+            <ul>
+                <li>Total Questions: 10 per quiz</li>
+                <li>Time per Question: 15 seconds</li>
+                <li>Scoring: 10 points for correct answer + remaining seconds as bonus</li>
+                <li>Hint: Click "Show Hint" to get a hint (-1 point)</li>
+                <li>Wrong answer: 0 points, streak resets</li>
+                <li>Try to maintain a streak for extra motivation!</li>
+            </ul>
+        </div>
     </div>
     <div class="container" id="quizScreen" style="display:none;">
         <div class="timer" id="timer">Time: 15</div>
@@ -203,7 +204,7 @@
         <button id="hint">Show Hint (-1 pt)</button>
         <button id="next" style="display:none;">Next Question</button>
         <div class="score" id="score"></div>
-        <button id="back" style="display:none;">Back to Start</button>
+        <button id="back">Exit Quiz</button>
     </div>
 
     <script>
@@ -224,7 +225,7 @@
             { q: "Which organ purifies blood?", options: ["Kidney", "Liver", "Heart", "Lungs"], answer: "Kidney", hint: "Filters waste", category: "General", level: "Medium" },
             { q: "What is the chemical symbol for gold?", options: ["Au", "Ag", "Gd", "Go"], answer: "Au", hint: "From Latin 'Aurum'", category: "General", level: "Medium" },
             { q: "Fastest bird in the world?", options: ["Peregrine Falcon", "Eagle", "Sparrow", "Ostrich"], answer: "Peregrine Falcon", hint: "Dives at high speed", category: "General", level: "Medium" },
-            { q: "Largest desert in the world?", options: ["Sahara", "Gobi", "Kalahari", "Arctic"], answer: "Sahara", hint: "Northern Africa", category: "General", level: "Medium" },
+            { q: "Largest hot desert in the world?", options: ["Sahara", "Gobi", "Kalahari", "Arctic"], answer: "Sahara", hint: "Northern Africa", category: "General", level: "Medium" },
             { q: "Who proposed the theory of relativity?", options: ["Albert Einstein", "Isaac Newton", "Galileo", "Nikola Tesla"], answer: "Albert Einstein", hint: "E = mc^2", category: "General", level: "Medium" },
             { q: "What is the boiling point of water in Celsius?", options: ["100°C", "90°C", "80°C", "120°C"], answer: "100°C", hint: "At standard pressure", category: "General", level: "Medium" },
             { q: "Which country has the Great Barrier Reef?", options: ["Australia", "USA", "Brazil", "South Africa"], answer: "Australia", hint: "Famous coral reef", category: "General", level: "Medium" },
@@ -278,7 +279,7 @@
             { q: "Solve: x² – 5x + 6 = 0", options: ["2 & 3", "1 & 6", "3 & 4", "2 & 4"], answer: "2 & 3", hint: "Factorize", category: "Aptitude", level: "Hard" },
             { q: "Compound Interest P=1000, R=10%, T=2yr", options: ["210", "200", "220", "100"], answer: "210", hint: "CI = P*((1+R/100)^T –1)", category: "Aptitude", level: "Hard" },
             { q: "Number series: 2, 6, 12, 20, ?", options: ["28", "30", "26", "24"], answer: "30", hint: "Pattern: add 4,6,8...", category: "Aptitude", level: "Hard" },
-            { q: "7/8 + 5/12 = ?", options: ["29/24", "31/24", "23/24", "19/24"], answer: "29/24", hint: "LCM of denominators", category: "Aptitude", level: "Hard" },
+            { q: "7/8 + 5/12 = ?", options: ["29/24", "31/24", "23/24", "19/24"], answer: "31/24", hint: "LCM of denominators", category: "Aptitude", level: "Hard" },
             { q: "2x + 3y = 12; x=2 → y=?", options: ["2", "3", "4", "6"], answer: "2", hint: "Plug x=2", category: "Aptitude", level: "Hard" },
             { q: "Permutation: 5! = ?", options: ["120", "100", "150", "60"], answer: "120", hint: "Factorial", category: "Aptitude", level: "Hard" },
             { q: "Probability of rolling 1 on die?", options: ["1/6", "1/5", "1/4", "1/3"], answer: "1/6", hint: "One favorable outcome", category: "Aptitude", level: "Hard" },
@@ -301,18 +302,55 @@
             { q: "If all cats are animals and some animals are dogs, are all cats dogs?", options: ["Yes", "No"], answer: "No", hint: "Logical reasoning", category: "Reasoning", level: "Medium" },
             { q: "Next series: 3, 6, 9, 12, ?", options: ["15", "18", "16", "20"], answer: "15", hint: "Add 3", category: "Reasoning", level: "Medium" },
             { q: "Find missing: 2, 5, 10, 17, ?", options: ["26", "24", "25", "27"], answer: "26", hint: "Add consecutive odd numbers", category: "Reasoning", level: "Medium" },
-            { q: "Seating arrangement puzzle", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option2", hint: "Check adjacency", category: "Reasoning", level: "Medium" },
+            {
+                q: "Seating arrangement puzzle",
+                options: [
+                    "A sits next to B",
+                    "B sits between C and D",
+                    "C sits at the end",
+                    "D sits opposite A"
+                ],
+                answer: "B sits between C and D"
+                , hint: "Check adjacency", category: "Reasoning", level: "Medium"
+            },
             { q: "If A → B, B → C, then A → C?", options: ["Yes", "No"], answer: "Yes", hint: "Transitive", category: "Reasoning", level: "Medium" },
             { q: "Code: If A=1,B=2,AB=?", "options": ["3", "12", "21", "4"], answer: "3", hint: "Add values", category: "Reasoning", level: "Medium" },
-            { q: "Logical puzzle: 5 people sit in a row, X next to Y?", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option1", hint: "Check positions", category: "Reasoning", level: "Medium" },
+            {
+                q: "Logical puzzle: 5 people sit in a row, X next to Y?",
+                options: [
+                    "X is left of Y",
+                    "X is right of Y",
+                    "X is at the end",
+                    "X is opposite Y"
+                ],
+                answer: "X is left of Y", hint: "Check positions", category: "Reasoning", level: "Medium"
+            },
             { q: "Blood relation: A is B’s father, C is A’s son, how is C related to B?", options: ["Son", "Grandson", "Brother", "Father"], answer: "Son", hint: "Use family tree", category: "Reasoning", level: "Medium" },
             { q: "Find pattern: 2,4,8,14,?", options: ["20", "22", "18", "24"], answer: "20", hint: "Difference pattern", category: "Reasoning", level: "Medium" },
             { q: "Which number is missing: 1,4,9,16,?", options: ["20", "25", "24", "30"], answer: "25", hint: "Square numbers", category: "Reasoning", level: "Medium" },
 
-            { q: "Puzzle: Five friends sit in different chairs, X left of Y, Z right of W, etc.", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option3", hint: "Logic diagram", category: "Reasoning", level: "Hard" },
+            {
+                q: "Puzzle: Five friends sit in different chairs, X left of Y, Z right of W, etc.",
+                options: [
+                    "X, Y, Z, W, V",
+                    "Y, X, W, Z, V",
+                    "V, W, X, Y, Z",
+                    "Z, X, Y, V, W"
+                ],
+                answer: "V, W, X, Y, Z", hint: "Logic diagram", category: "Reasoning", level: "Hard"
+            },
             { q: "Syllogism: All A are B, Some B are C, are all A C?", options: ["Yes", "No"], answer: "No", hint: "Use Venn diagram", category: "Reasoning", level: "Hard" },
             { q: "Series: 2,6,12,20,30,?", options: ["42", "40", "44", "36"], answer: "42", hint: "Pattern n^2+n", category: "Reasoning", level: "Hard" },
-            { q: "Complex puzzle: If X+Y=Z, Y+Z=W, find X?", options: ["Option1", "Option2", "Option3", "Option4"], answer: "Option2", hint: "Equation solve", category: "Reasoning", level: "Hard" },
+            {
+                q: "Complex puzzle: If X+Y=Z, Y+Z=W, find X?",
+                options: [
+                    "W - 2Y",
+                    "Z - Y",
+                    "W - Z",
+                    "Y - Z"
+                ],
+                answer: "Z - Y", hint: "Equation solve", category: "Reasoning", level: "Hard"
+            },
             { q: "Analogy: Dog : Bark :: Cat : ?", options: ["Meow", "Mew", "Miaow", "Rawr"], answer: "Meow", hint: "Sound of cat", category: "Reasoning", level: "Hard" },
             { q: "Blood relation: P is Q's brother, R is Q's mother, how is P related to R?", options: ["Son", "Father", "Uncle", "Nephew"], answer: "Son", hint: "Family tree", category: "Reasoning", level: "Hard" },
             { q: "Logical reasoning: A is taller than B, C is shorter than A, who is tallest?", options: ["A", "B", "C", "Cannot say"], answer: "A", hint: "Compare heights", category: "Reasoning", level: "Hard" },
@@ -503,7 +541,7 @@
             quizScreen.style.display = 'block';
             timerEl.style.display = 'block';
             streakEl.style.display = 'block';
-            backBtn.style.display = 'none';
+            backBtn.style.display = 'block';
             currentQ = 0;
             score = 0;
             streak = 0;
@@ -511,12 +549,24 @@
         }
 
         backBtn.onclick = () => {
-            startScreen.style.display = 'block';
-            quizScreen.style.display = 'none';
-            timerEl.style.display = 'block';
-            streakEl.style.display = 'block';
-            usernameInput.value = '';
-            scoreEl.textContent = '';
+
+            if (confirm("Are you sure you want to exit the quiz? Your progress will be lost.")) {
+
+                clearInterval(timerInterval);
+
+                startScreen.style.display = 'block';
+                quizScreen.style.display = 'none';
+
+                usernameInput.value = '';
+                scoreEl.textContent = '';
+                timerEl.style.display = 'block';
+                streakEl.style.display = 'block';
+
+                currentQ = 0;
+                score = 0;
+                streak = 0;
+            }
+
         }
     </script>
 
