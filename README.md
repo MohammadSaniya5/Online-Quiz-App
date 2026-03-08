@@ -36,6 +36,6 @@ This project focuses on clean UI design, smooth navigation, and real-time quiz e
 ## 🔗 Live Links
 
 -  Repository: [Online-Quiz-App](https://github.com/MohammadSaniya5/Online-Quiz-App )
--  Live Demo: [Link](https://MohammadSaniya5.github.io/Online-Quiz-App/)
+-  Live Demo: [Link](https://online-quiz.com/)
 
  
